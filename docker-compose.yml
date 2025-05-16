@@ -1,0 +1,79 @@
+version: "3.7"
+
+services:
+  temporal:
+    image: temporalio/auto-setup:1.27.2
+    container_name: temporal
+    ports:
+      - "7233:7233"
+    environment:
+      - DB=postgres12
+      - DB_PORT=5432
+      - POSTGRES_USER=temporal
+      - POSTGRES_PWD=temporal
+      - POSTGRES_SEEDS=postgres
+    networks:
+      - app-network
+
+  postgres:
+    image: postgres:13
+    container_name: postgres
+    environment:
+      - POSTGRES_USER=temporal
+      - POSTGRES_PASSWORD=temporal
+    ports:
+      - "5432:5432"
+    networks:
+      - app-network
+
+  temporal-ui:
+    image: temporalio/ui:2.34.0
+    container_name: temporal-ui
+    ports:
+      - "8080:8080"
+    environment:
+      - TEMPORAL_ADDRESS=temporal:7233
+    depends_on:
+      - temporal
+    networks:
+      - app-network
+
+  loki:
+    image: grafana/loki:2.9.3
+    container_name: loki
+    ports:
+      - "3100:3100"
+    volumes:
+      - ./deployments/loki/loki-config.yaml:/etc/loki/loki-config.yaml
+    command: -config.file=/etc/loki/loki-config.yaml
+    networks:
+      - app-network
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    ports:
+      - "3001:3000"
+    depends_on:
+      - loki
+    volumes:
+      - grafana-storage:/var/lib/grafana
+      - ./deployments/grafana/datasources:/etc/grafana/provisioning/datasources
+    networks:
+      - app-network
+
+  promtail:
+    image: grafana/promtail:latest
+    container_name: promtail
+    volumes:
+      - ./deployments/promtail/config.yaml:/etc/promtail/config.yaml # ✅ Correct: bind a file
+      - /Users/rishi/logs:/var/log/host # ✅ Mount your actual log directory
+    command: -config.file=/etc/promtail/config.yaml
+    networks:
+      - app-network
+
+volumes:
+  grafana-storage:
+
+networks:
+  app-network:

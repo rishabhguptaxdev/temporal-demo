@@ -1,0 +1,28 @@
+server:
+  http_listen_port: 9080
+  grpc_listen_port: 0
+
+positions:
+  filename: /tmp/positions.yaml
+
+clients:
+  - url: http://loki:3100/loki/api/v1/push
+    batchwait: 1s # ⏱️ Reduce from default 1s to make it push more often
+    batchsize: 10240 # ⬆️ Increase batch size if needed (default is 102400)
+
+scrape_configs:
+  - job_name: express
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: express
+          __path__: /var/log/host/express.log
+
+  - job_name: temporal-worker
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: temporal-worker
+          __path__: /var/log/host/temporal-worker.log

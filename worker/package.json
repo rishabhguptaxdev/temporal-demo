@@ -1,0 +1,13 @@
+{
+	"name": "temporal-worker",
+	"version": "1.0.0",
+	"description": "Temporal worker to run workflows",
+	"main": "worker.js",
+	"scripts": {
+		"start": "node worker.js"
+	},
+	"dependencies": {
+		"@temporalio/worker": "^1.10.0",
+		"@temporalio/client": "^1.10.0"
+	}
+}
