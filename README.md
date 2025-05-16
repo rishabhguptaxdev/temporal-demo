@@ -23,7 +23,7 @@ Logs from both the Express server and Temporal worker are forwarded to Grafana u
 ## 🚀 Quick Setup
 
 ```bash
-git clone https://github.com/your-username/temporal-demo.git
+git clone https://github.com/rishabhguptaxdev/temporal-demo.git
 cd temporal-demo
 cd server && npm install
 cd ../worker && npm install
